@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cuestionario de Huella Ecológica</title>
-
+  <title>Cuestionario de Huella Ecológica (Responsive)</title>
   <style>
     :root{
       --bg:#0f172a;
@@ -16,489 +15,606 @@
       --bad:#ef4444;
       --mid:#f59e0b;
       --good:#10b981;
+      --glass: rgba(255,255,255,0.03);
+      --gap: 0.75rem;
     }
 
+    /* Reset básico */
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family:system-ui;
-      background:#0f172a;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;
+      background:linear-gradient(180deg,#071028,#0f172a 60%);
       color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.35;
+      padding-bottom:3rem;
     }
 
     header{
-      padding:2rem 1rem;
-      background:#111827;
-      border-bottom:1px solid #1f2937;
+      padding:1.25rem;
       text-align:center;
+      background:linear-gradient(90deg,#071025,#0b1630);
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      position:sticky;
+      top:0;
+      z-index:40;
+      backdrop-filter: blur(6px);
     }
-    header h1{
-      margin:0 0 .5rem;
-      font-size:2rem;
-    }
-    header .subtitle{
-      color:var(--muted);
-      font-size:1rem;
-    }
+    header h1{margin:0;font-size:1.25rem}
+    header p{margin:.35rem 0 0;color:var(--muted);font-size:.9rem}
 
     .container{
       max-width:960px;
-      margin:0 auto;
-      padding:1.5rem;
+      margin:1rem auto;
+      padding:1rem;
+      display:flex;
+      flex-direction:column;
+      gap:1rem;
     }
 
     .card{
-      background:#1f2937;
-      border:1px solid #263043;
+      background:linear-gradient(180deg,var(--card),#17202b);
+      border:1px solid rgba(255,255,255,0.03);
       border-radius:14px;
-      padding:1.25rem;
-      margin-bottom:1.5rem;
-      box-shadow:0 10px 24px rgba(0,0,0,.25);
+      padding:1rem;
+      box-shadow:0 10px 30px rgba(2,6,23,0.6);
     }
+
     .card h2{
-      margin-top:0;
-      margin-bottom:1rem;
-      font-size:1.4rem;
-      border-bottom:1px solid #2f3a4d;
-      padding-bottom:.4rem;
+      margin:0 0 .75rem;
+      font-size:1.05rem;
+      display:flex;
+      align-items:center;
+      gap:.6rem;
     }
 
     .question{
-      background:#202b3a;
-      border:1px solid #283246;
-      margin-bottom:.8rem;
-      padding:.8rem;
+      background:var(--glass);
       border-radius:10px;
+      padding:.6rem;
+      margin-bottom:.6rem;
+      border:1px solid rgba(255,255,255,0.02);
     }
-    .question label{
-      font-weight:600;
+    .question label.qtext{
       display:block;
-      margin-bottom:.5rem;
+      font-weight:600;
+      margin-bottom:.45rem;
+      font-size:0.95rem;
     }
 
+    /* Opciones: adaptativo automático */
     .options{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:.5rem;
+      gap:.45rem;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
 
     .opt{
       display:flex;
       align-items:center;
-      gap:.5rem;
-      background:#273243;
-      border:1px solid #2f3a4d;
-      padding:.5rem;
+      gap:.6rem;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.02);
+      padding:.55rem;
       border-radius:10px;
       cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
     }
+    .opt input[type="radio"]{
+      width:20px;height:20px;
+      accent-color:var(--accent);
+    }
+    .opt:hover{ transform:translateY(-3px); box-shadow:0 6px 20px rgba(2,6,23,0.6) }
+    .opt span{font-weight:600;font-size:.95rem;color:var(--text)}
 
+    /* Controls */
     .controls{
       display:flex;
-      gap:1rem;
-      margin-top:1rem;
+      gap:.6rem;
+      justify-content:flex-end;
+      margin-top:.5rem;
+      flex-wrap:wrap;
     }
-
     button{
-      padding:.75rem 1.2rem;
-      font-weight:bold;
+      border:0;
+      padding:.65rem .9rem;
+      font-weight:700;
       border-radius:10px;
       cursor:pointer;
-      border:none;
     }
     .primary{
       background:linear-gradient(90deg,#0ea5e9,#22d3ee);
-      color:#0b1220;
+      color:#04202a;
+      box-shadow:0 8px 20px rgba(34,211,238,0.15);
     }
     .secondary{
-      background:#374151;
-      color:#e5e7eb;
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.06);
+      color:var(--text);
     }
 
     /* Resultado */
     #result{
       display:none;
-      background:#1f2937;
-      border:1px solid #263043;
-      border-radius:14px;
-      padding:1.25rem;
-      margin-top:1rem;
+      margin-top:.75rem;
+      padding:1rem;
+      border-radius:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
     }
-    #score{
-      font-size:1.4rem;
-      font-weight:bold;
-      margin-bottom:.5rem;
+    #score{font-weight:800;font-size:1.15rem}
+    #message{margin:.4rem 0 0}
+
+    /* Barra de progreso */
+    .progress-wrap{
+      height:10px;
+      background:rgba(255,255,255,0.03);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:.5rem;
     }
+    .progress{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--good),var(--mid));
+      transition:width .6s ease, background .3s ease;
+    }
+
+    /* Pequeños ajustes responsivos */
+    @media (max-width:520px){
+      header h1{font-size:1rem}
+      .opt span{font-size:.9rem}
+      .container{padding:.6rem}
+      .card{padding:.85rem}
+    }
+
+    /* Para accesibilidad: mayor área táctil */
+    input[type="radio"]{touch-action:manipulation}
   </style>
 </head>
 <body>
 
 <header>
   <h1>Cuestionario de Huella Ecológica</h1>
-  <div class="subtitle">Evalúa tu impacto ambiental</div>
+  <p>28 preguntas • Responde con honestidad — menor puntaje = mejor impacto</p>
 </header>
 
-<div class="container">
-
+<main class="container" id="formContainer">
   <!-- 🥗 Alimentación -->
-  <section class="card">
-    <h2>🥗 Alimentación</h2>
+  <section class="card" aria-labelledby="alimento">
+    <h2 id="alimento">🥗 Alimentación</h2>
 
     <div class="question">
-      <label>1. ¿Con qué frecuencia consumes frutas y verduras frescas?</label>
+      <label class="qtext">1. ¿Con qué frecuencia consumes frutas y verduras frescas?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q1" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q1" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q1" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q1" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q1" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q1" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q1" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q1" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>2. ¿Qué tan seguido eliges productos locales o de temporada?</label>
+      <label class="qtext">2. ¿Qué tan seguido eliges productos locales o de temporada?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q2" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q2" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q2" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q2" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q2" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q2" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q2" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q2" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>3. ¿Con qué frecuencia reduces el consumo de alimentos ultraprocesados?</label>
+      <label class="qtext">3. ¿Con qué frecuencia reduces el consumo de alimentos ultraprocesados?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q3" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q3" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q3" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q3" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q3" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q3" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q3" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q3" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>4. ¿Qué tan frecuente evitas el desperdicio de alimentos?</label>
+      <label class="qtext">4. ¿Qué tan frecuente evitas el desperdicio de alimentos en casa?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q4" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q4" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q4" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q4" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q4" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q4" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q4" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q4" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
   <!-- 🚲 Transporte -->
-  <section class="card">
-    <h2>🚲 Transporte</h2>
+  <section class="card" aria-labelledby="trans">
+    <h2 id="trans">🚲 Transporte</h2>
 
     <div class="question">
-      <label>5. ¿Con qué frecuencia usas transporte público o compartido?</label>
+      <label class="qtext">5. ¿Con qué frecuencia usas transporte público o compartido?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q5" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q5" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q5" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q5" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q5" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q5" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q5" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q5" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>6. ¿Qué tan seguido caminas o usas bicicleta?</label>
+      <label class="qtext">6. ¿Qué tan seguido caminas o usas bicicleta para trasladarte?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q6" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q6" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q6" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q6" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q6" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q6" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q6" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q6" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>7. ¿Con qué frecuencia eliges vehículos de bajas emisiones?</label>
+      <label class="qtext">7. ¿Con qué frecuencia eliges vehículos de bajas emisiones o eléctricos?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q7" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q7" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q7" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q7" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q7" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q7" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q7" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q7" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>8. ¿Qué tan frecuente reduces desplazamientos innecesarios?</label>
+      <label class="qtext">8. ¿Qué tan frecuente organizas tus viajes para reducir desplazamientos innecesarios?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q8" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q8" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q8" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q8" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q8" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q8" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q8" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q8" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
   <!-- 💡 Energía -->
-  <section class="card">
-    <h2>💡 Consumo de energía</h2>
+  <section class="card" aria-labelledby="energia">
+    <h2 id="energia">💡 Consumo de energía</h2>
 
     <div class="question">
-      <label>9. ¿Con qué frecuencia apagas las luces?</label>
+      <label class="qtext">9. ¿Con qué frecuencia apagas las luces al salir de una habitación?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q9" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q9" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q9" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q9" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q9" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q9" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q9" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q9" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>10. ¿Qué tan seguido usas focos de bajo consumo?</label>
+      <label class="qtext">10. ¿Qué tan seguido usas bombillas o focos de bajo consumo?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q10" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q10" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q10" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q10" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q10" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q10" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q10" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q10" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>11. ¿Con qué frecuencia desconectas aparatos?</label>
+      <label class="qtext">11. ¿Con qué frecuencia desconectas aparatos electrónicos que no usas?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q11" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q11" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q11" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q11" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q11" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q11" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q11" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q11" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>12. ¿Qué tan frecuente aprovechas la luz natural?</label>
+      <label class="qtext">12. ¿Qué tan frecuente aprovechas la luz natural para iluminar tu hogar?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q12" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q12" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q12" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q12" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q12" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q12" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q12" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q12" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
   <!-- 🚿 Agua -->
-  <section class="card">
-    <h2>🚿 Consumo de agua</h2>
+  <section class="card" aria-labelledby="agua">
+    <h2 id="agua">🚿 Consumo de agua</h2>
 
     <div class="question">
-      <label>13. ¿Con qué frecuencia cierras la llave al cepillarte o lavar platos?</label>
+      <label class="qtext">13. ¿Con qué frecuencia cierras la llave mientras te cepillas los dientes o lavas platos?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q13" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q13" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q13" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q13" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q13" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q13" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q13" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q13" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>14. ¿Qué tan seguido tomas duchas cortas?</label>
+      <label class="qtext">14. ¿Qué tan seguido tomas duchas cortas para ahorrar agua?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q14" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q14" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q14" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q14" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q14" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q14" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q14" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q14" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>15. ¿Con qué frecuencia reutilizas agua?</label>
+      <label class="qtext">15. ¿Con qué frecuencia reutilizas agua (por ejemplo, para regar plantas)?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q15" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q15" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q15" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q15" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q15" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q15" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q15" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q15" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>16. ¿Qué tan frecuente revisas y reparas fugas?</label>
+      <label class="qtext">16. ¿Qué tan frecuente revisas y reparas fugas de agua en casa?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q16" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q16" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q16" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q16" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q16" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q16" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q16" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q16" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
   <!-- ♻️ Residuos -->
-  <section class="card">
-    <h2>♻️ Residuos generados</h2>
+  <section class="card" aria-labelledby="residuos">
+    <h2 id="residuos">♻️ Residuos generados</h2>
 
     <div class="question">
-      <label>17. ¿Con qué frecuencia separas residuos para reciclar?</label>
+      <label class="qtext">17. ¿Con qué frecuencia separas los residuos para reciclar?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q17" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q17" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q17" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q17" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q17" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q17" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q17" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q17" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>18. ¿Qué tan seguido reduces plásticos desechables?</label>
+      <label class="qtext">18. ¿Qué tan seguido reduces el uso de plásticos desechables?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q18" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q18" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q18" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q18" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q18" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q18" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q18" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q18" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>19. ¿Con qué frecuencia reutilizas envases o bolsas?</label>
+      <label class="qtext">19. ¿Con qué frecuencia reutilizas envases o bolsas?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q19" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q19" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q19" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q19" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q19" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q19" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q19" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q19" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>20. ¿Con qué frecuencia compostas residuos orgánicos?</label>
+      <label class="qtext">20. ¿Con qué frecuencia compostas residuos orgánicos?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q20" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q20" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q20" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q20" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q20" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q20" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q20" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q20" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
-  <!-- 🛍️ Consumo de productos -->
-  <section class="card">
-    <h2>🛍️ Consumo de productos</h2>
+  <!-- 🛍️ Consumo -->
+  <section class="card" aria-labelledby="consumo">
+    <h2 id="consumo">🛍️ Consumo de productos</h2>
 
     <div class="question">
-      <label>21. ¿Con qué frecuencia compras solo lo necesario?</label>
+      <label class="qtext">21. ¿Con qué frecuencia compras solo lo necesario para evitar el consumo excesivo?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q21" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q21" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q21" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q21" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q21" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q21" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q21" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q21" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>22. ¿Qué tan seguido prefieres productos duraderos?</label>
+      <label class="qtext">22. ¿Qué tan seguido prefieres productos duraderos o reutilizables?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q22" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q22" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q22" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q22" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q22" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q22" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q22" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q22" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>23. ¿Con qué frecuencia reparas objetos antes de desecharlos?</label>
+      <label class="qtext">23. ¿Con qué frecuencia reparas objetos antes de desecharlos?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q23" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q23" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q23" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q23" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q23" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q23" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q23" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q23" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>24. ¿Qué tan frecuente compras productos ecológicos?</label>
+      <label class="qtext">24. ¿Qué tan frecuente compras productos ecológicos o certificados?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q24" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q24" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q24" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q24" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q24" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q24" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q24" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q24" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
   <!-- 🌳 Espacios verdes -->
-  <section class="card">
-    <h2>🌳 Espacios verdes</h2>
+  <section class="card" aria-labelledby="verdes">
+    <h2 id="verdes">🌳 Espacios verdes</h2>
 
     <div class="question">
-      <label>25. ¿Con qué frecuencia visitas parques?</label>
+      <label class="qtext">25. ¿Con qué frecuencia visitas parques o espacios verdes?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q25" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q25" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q25" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q25" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q25" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q25" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q25" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q25" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>26. ¿Qué tan seguido participas en actividades ambientales?</label>
+      <label class="qtext">26. ¿Qué tan seguido participas en actividades de cuidado ambiental?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q26" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q26" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q26" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q26" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q26" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q26" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q26" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q26" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>27. ¿Con qué frecuencia promueves la conservación de espacios verdes?</label>
+      <label class="qtext">27. ¿Con qué frecuencia promueves el uso y conservación de espacios verdes?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q27" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q27" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q27" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q27" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q27" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q27" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q27" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q27" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
 
     <div class="question">
-      <label>28. ¿Qué tan frecuente plantas árboles o cuidas plantas?</label>
+      <label class="qtext">28. ¿Qué tan frecuente plantas árboles o cuidas plantas en tu entorno?</label>
       <div class="options">
-        <label class="opt"><input type="radio" name="q28" value="1">Siempre</label>
-        <label class="opt"><input type="radio" name="q28" value="2">Frecuentemente</label>
-        <label class="opt"><input type="radio" name="q28" value="3">Ocasionalmente</label>
-        <label class="opt"><input type="radio" name="q28" value="4">Nunca</label>
+        <label class="opt"><input type="radio" name="q28" value="1"><span>A) Siempre</span></label>
+        <label class="opt"><input type="radio" name="q28" value="2"><span>B) Frecuentemente</span></label>
+        <label class="opt"><input type="radio" name="q28" value="3"><span>C) Ocasionalmente</span></label>
+        <label class="opt"><input type="radio" name="q28" value="4"><span>D) Nunca</span></label>
       </div>
     </div>
   </section>
 
-  <!-- Botones -->
-  <div class="controls">
-    <button class="primary" onclick="calcular()">Calcular resultado</button>
-    <button class="secondary" onclick="reiniciar()">Reiniciar</button>
-  </div>
+  <!-- Controles y resultado -->
+  <div class="card" style="display:flex;flex-direction:column;gap:.6rem;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.6rem;">
+      <div style="display:flex;flex-direction:column;gap:.4rem;max-width:70%;">
+        <strong>Progreso</strong>
+        <div class="progress-wrap" aria-hidden="true">
+          <div class="progress" id="progressBar" style="width:0%"></div>
+        </div>
+      </div>
 
-  <!-- RESULTADO -->
-  <div id="result">
-    <h2>Resultado</h2>
-    <div id="score"></div>
-    <p id="message"></p>
-  </div>
+      <div style="display:flex;gap:.6rem;">
+        <button class="secondary" onclick="reiniciar()" type="button">Reiniciar</button>
+        <button class="primary" onclick="calcular()" type="button">Calcular resultado</button>
+      </div>
+    </div>
 
-</div>
+    <div id="result" aria-live="polite">
+      <div id="score">Tu puntuación:</div>
+      <div id="message"></div>
+    </div>
+  </div>
+</main>
 
 <script>
-function calcular(){
-  let total = 0;
-  for(let i=1; i<=28; i++){
-    const q = document.querySelector(`input[name="q${i}"]:checked`);
-    if(!q){
-      alert("⚠️ Debes responder todas las preguntas");
-      return;
+  // Constantes del cuestionario
+  const QUESTIONS = 28;
+  const MIN_SCORE = QUESTIONS * 1; // 28
+  const MAX_SCORE = QUESTIONS * 4; // 112
+
+  // Actualiza barra de progreso mientras el usuario responde
+  function updateProgress(){
+    let answered = 0;
+    for(let i=1;i<=QUESTIONS;i++){
+      if(document.querySelector(`input[name="q${i}"]:checked`)) answered++;
     }
-    total += Number(q.value);
+    const pct = Math.round((answered / QUESTIONS) * 100);
+    const bar = document.getElementById('progressBar');
+    bar.style.width = pct + '%';
+    // color gradient: green -> yellow -> red
+    if(pct >= 80) bar.style.background = 'linear-gradient(90deg,var(--good),#7dd3a6)';
+    else if(pct >= 50) bar.style.background = 'linear-gradient(90deg,var(--mid),#facc15)';
+    else bar.style.background = 'linear-gradient(90deg,var(--bad),#fb7185)';
   }
 
-  document.getElementById("result").style.display = "block";
-  document.getElementById("score").textContent = "Tu puntuación es: " + total;
+  // Attach listener to all radios to update progress on change (delegation not needed)
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.matches('input[type="radio"]')){
+      updateProgress();
+    }
+  });
 
-  let msg="";
-  if(total <= 40) msg="🌱 Impacto ecológico MUY bajo. ¡Excelente!";
-  else if(total <= 65) msg="♻️ Impacto moderado. Puedes mejorar.";
-  else msg="🌍 Impacto alto. Revisa tus hábitos ambientales.";
+  // Calcular resultado
+  function calcular(){
+    let total = 0;
+    for(let i=1;i<=QUESTIONS;i++){
+      const sel = document.querySelector(`input[name="q${i}"]:checked`);
+      if(!sel){
+        // scroll to first unanswered question
+        const qNode = document.querySelector(`input[name="q${i}"]`);
+        if(qNode){
+          qNode.scrollIntoView({behavior:'smooth',block:'center'});
+        }
+        alert('Por favor responde todas las preguntas antes de calcular.');
+        return;
+      }
+      total += Number(sel.value);
+    }
 
-  document.getElementById("message").textContent = msg;
-}
+    // Mostrar resultado
+    const result = document.getElementById('result');
+    const scoreEl = document.getElementById('score');
+    const msgEl = document.getElementById('message');
 
-function reiniciar(){
-  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked=false);
-  document.getElementById("result").style.display="none";
-}
+    scoreEl.textContent = `Tu puntuación: ${total} (mín ${MIN_SCORE} — máx ${MAX_SCORE})`;
+
+    // Normalizar a porcentaje donde 0% = mejor (MIN_SCORE) y 100% = peor (MAX_SCORE)
+    const normalized = (total - MIN_SCORE) / (MAX_SCORE - MIN_SCORE);
+    const percent = Math.round(normalized * 100);
+
+    let message = '';
+    let bg = '';
+    if(percent <= 30){
+      message = '🌱 Impacto ecológico MUY bajo. ¡Excelente! Sigue así.';
+      bg = 'linear-gradient(90deg,var(--good),#7dd3a6)';
+    } else if(percent <= 60){
+      message = '♻️ Impacto moderado. Hay hábitos que puedes mejorar.';
+      bg = 'linear-gradient(90deg,var(--mid),#fbbf24)';
+    } else {
+      message = '🌍 Impacto alto. Te recomendamos revisar y cambiar algunos hábitos.';
+      bg = 'linear-gradient(90deg,var(--bad),#fb7185)';
+    }
+
+    msgEl.textContent = `${message} (${percent}% en la escala de mejora)`;
+
+    // actualiza barra de progreso final basado en percent (invertimos visual)
+    const bar = document.getElementById('progressBar');
+    // mostramos "completitud" de respuestas; también cambiamos color a según score
+    bar.style.width = '100%';
+    bar.style.background = bg;
+
+    result.style.display = 'block';
+    result.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  // Reiniciar formulario
+  function reiniciar(){
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('progressBar').style.background = 'linear-gradient(90deg,var(--good),var(--mid))';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // Inicializa el color
+  document.getElementById('progressBar').style.background = 'linear-gradient(90deg,var(--good),var(--mid))';
 </script>
-
 </body>
 </html>
 
